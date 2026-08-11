@@ -2,13 +2,30 @@ import { getApplications } from '../store';
 import { filterApplicationsByDate } from '../utils';
 import type { ApplicationStatus } from '../types';
 
+// 静态统一管理分页大小，修改这里即可全局生效
+const PAGE_SIZE = 10;
+
 export function renderList(container: HTMLElement) {
   const allApps = getApplications();
 
-  const render = (statusFilter: ApplicationStatus | 'all', startDate?: string, endDate?: string) => {
+  const render = (
+    statusFilter: ApplicationStatus | 'all',
+    startDate?: string,
+    endDate?: string,
+    page: number = 1
+  ) => {
     let filtered = statusFilter === 'all' ? allApps : allApps.filter(a => a.status === statusFilter);
-    // 使用工具函数进行日期过滤
     filtered = filterApplicationsByDate(filtered, startDate, endDate);
+
+    // 分页计算，使用静态常量PAGE_SIZE
+    const total = filtered.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    // 页码越界保护
+    if (page < 1) page = 1;
+    if (totalPages > 0 && page > totalPages) page = totalPages;
+
+    const startIndex = (page - 1) * PAGE_SIZE;
+    const pageData = filtered.slice(startIndex, startIndex + PAGE_SIZE);
 
     container.innerHTML = `
       <div class="card">
@@ -43,14 +60,20 @@ export function renderList(container: HTMLElement) {
             <tbody id="listBody"></tbody>
           </table>
         </div>
+        <!-- 分页区域 -->
+        <div class="pagination-bar" style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+          <span class="page-info">共 ${total} 条，第 ${page}/${totalPages || 1} 页</span>
+          <button id="prevPage" class="btn btn-sm" ${page <= 1 ? 'disabled' : ''}>上一页</button>
+          <button id="nextPage" class="btn btn-sm" ${page >= totalPages ? 'disabled' : ''}>下一页</button>
+        </div>
       </div>
     `;
 
     const tbody = document.getElementById('listBody')!;
-    if (filtered.length === 0) {
+    if (pageData.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" class="text-center table-empty-row">暂无匹配记录</td></tr>`;
     } else {
-      tbody.innerHTML = filtered.map(app => `
+      tbody.innerHTML = pageData.map(app => `
         <tr>
           <td><code class="table-id-code">${app.id}</code></td>
           <td>${app.title}</td>
@@ -67,22 +90,27 @@ export function renderList(container: HTMLElement) {
     const startInput = document.getElementById('startDate') as HTMLInputElement;
     const endInput = document.getElementById('endDate') as HTMLInputElement;
     const clearBtn = document.getElementById('clearDateBtn')!;
+    const prevBtn = document.getElementById('prevPage')! as HTMLButtonElement;
+    const nextBtn = document.getElementById('nextPage')! as HTMLButtonElement;
 
-    const refresh = () => {
+    const refresh = (newPage: number = 1) => {
       const status = statusSelect.value as ApplicationStatus | 'all';
       const s = startInput.value;
       const e = endInput.value;
-      render(status, s, e);
+      render(status, s, e, newPage);
     };
 
-    statusSelect.addEventListener('change', refresh);
-    startInput.addEventListener('change', refresh);
-    endInput.addEventListener('change', refresh);
+    statusSelect.addEventListener('change', () => refresh(1));
+    startInput.addEventListener('change', () => refresh(1));
+    endInput.addEventListener('change', () => refresh(1));
     clearBtn.addEventListener('click', () => {
       startInput.value = '';
       endInput.value = '';
-      refresh();
+      refresh(1);
     });
+
+    prevBtn.addEventListener('click', () => refresh(page - 1));
+    nextBtn.addEventListener('click', () => refresh(page + 1));
   };
 
   render('all');
