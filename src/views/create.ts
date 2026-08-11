@@ -50,7 +50,7 @@ export function renderCreate(container: HTMLElement) {
             <select id="typeSelect" class="form-control">${typeOptions}</select>
           </div>
           <div class="form-group">
-            <label class="form-label">标题</label>
+            <label class="form-label">标题<span class="required-mark">*</span></label>
             <input type="text" id="titleInput" class="form-control" value="${currentTitle}" placeholder="请输入标题" />
           </div>
           <div id="dynamicFields" class="dynamic-fields"></div>
@@ -76,27 +76,27 @@ export function renderCreate(container: HTMLElement) {
       let html = '';
       if (type === APPLICATION_TYPES.TRAVEL) {
         html = `
-          <div class="form-group"><label class="form-label">目的地</label><input class="form-control" type="text" id="dest" value="${currentContent.destination || ''}" /></div>
-          <div class="form-group"><label class="form-label">开始日期</label><input class="form-control" type="date" id="startDate" value="${currentContent.startDate || ''}" /></div>
-          <div class="form-group"><label class="form-label">结束日期</label><input class="form-control" type="date" id="endDate" value="${currentContent.endDate || ''}" /></div>
-          <div class="form-group"><label class="form-label">出行目的</label><input class="form-control" type="text" id="purpose" value="${currentContent.purpose || ''}" /></div>
-          <div class="form-group"><label class="form-label">预估费用</label><input class="form-control" type="number" id="cost" value="${currentContent.estimatedCost || ''}" /></div>
+          <div class="form-group"><label class="form-label">目的地<span class="required-mark">*</span></label><input class="form-control" type="text" id="dest" value="${currentContent.destination || ''}" /></div>
+          <div class="form-group"><label class="form-label">开始日期<span class="required-mark">*</span></label><input class="form-control" type="date" id="startDate" value="${currentContent.startDate || ''}" /></div>
+          <div class="form-group"><label class="form-label">结束日期<span class="required-mark">*</span></label><input class="form-control" type="date" id="endDate" value="${currentContent.endDate || ''}" /></div>
+          <div class="form-group"><label class="form-label">出行目的<span class="required-mark">*</span></label><input class="form-control" type="text" id="purpose" value="${currentContent.purpose || ''}" /></div>
+          <div class="form-group"><label class="form-label">预估费用<span class="required-mark">*</span></label><input class="form-control" type="number" id="cost" value="${currentContent.estimatedCost || ''}" /></div>
           <div class="form-group"><label class="form-label">交通方式</label><select id="transport" class="form-control"><option value="飞机">飞机</option><option value="高铁">高铁</option><option value="汽车">汽车</option></select></div>
         `;
       } else if (type === APPLICATION_TYPES.PURCHASE) {
         html = `
-          <div class="form-group"><label class="form-label">物品名称</label><input class="form-control" type="text" id="item" value="${currentContent.items?.[0]?.name || ''}" /></div>
-          <div class="form-group"><label class="form-label">供应商</label><input class="form-control" type="text" id="vendor" value="${currentContent.vendor || ''}" /></div>
+          <div class="form-group"><label class="form-label">物品名称<span class="required-mark">*</span></label><input class="form-control" type="text" id="item" value="${currentContent.items?.[0]?.name || ''}" /></div>
+          <div class="form-group"><label class="form-label">供应商<span class="required-mark">*</span></label><input class="form-control" type="text" id="vendor" value="${currentContent.vendor || ''}" /></div>
         `;
       } else if (type === APPLICATION_TYPES.REIMBURSEMENT) {
         html = `
-          <div class="form-group"><label class="form-label">费用类别</label><input class="form-control" type="text" id="expCat" value="${currentContent.expenses?.[0]?.category || ''}" /></div>
-          <div class="form-group"><label class="form-label">金额</label><input class="form-control" type="number" id="expAmt" value="${currentContent.expenses?.[0]?.amount || ''}" /></div>
+          <div class="form-group"><label class="form-label">费用类别<span class="required-mark">*</span></label><input class="form-control" type="text" id="expCat" value="${currentContent.expenses?.[0]?.category || ''}" /></div>
+          <div class="form-group"><label class="form-label">金额<span class="required-mark">*</span></label><input class="form-control" type="number" id="expAmt" value="${currentContent.expenses?.[0]?.amount || ''}" /></div>
         `;
       } else if (type === APPLICATION_TYPES.OVERTIME) {
         html = `
-          <div class="form-group"><label class="form-label">加班日期</label><input class="form-control" type="date" id="otDate" value="${currentContent.date || ''}" /></div>
-          <div class="form-group"><label class="form-label">加班时长（小时）</label><input class="form-control" type="number" id="otHours" value="${currentContent.hours || ''}" /></div>
+          <div class="form-group"><label class="form-label">加班日期<span class="required-mark">*</span></label><input class="form-control" type="date" id="otDate" value="${currentContent.date || ''}" /></div>
+          <div class="form-group"><label class="form-label">加班时长（小时）<span class="required-mark">*</span></label><input class="form-control" type="number" id="otHours" value="${currentContent.hours || ''}" /></div>
         `;
       } else if (type === APPLICATION_TYPES.CUSTOM) {
         html = `
@@ -140,7 +140,7 @@ export function renderCreate(container: HTMLElement) {
       const { type, title, applicant, content } = collectFormData();
       const error = validateForm(type, title, content);
       if (error) {
-        alert(`⚠️ ${error}`);
+        showToast(error, 'warning');
         return;
       }
       if (previewOnly) {
@@ -161,7 +161,7 @@ export function renderCreate(container: HTMLElement) {
         submittedAt: new Date().toISOString(),
       };
       addApplication(newApp);
-      alert('✅ 申请已提交！');
+      showToast('申请已提交！', 'success');
       window.location.hash = 'list';
     };
 

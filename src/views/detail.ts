@@ -2,7 +2,7 @@ import { getApplicationById, updateApplication } from '../store';
 import { statusLabels, formatContentFields } from '../utils';
 import type { ApplicationStatus } from '../types';
 
-export function renderDetail(container: HTMLElement, id: string) {
+export function renderDetail(container: HTMLElement, id: string): void {
   const app = getApplicationById(id);
   if (!app) {
     container.innerHTML = `<div class="card text-center card-notfound">申请不存在</div>`;
@@ -45,9 +45,9 @@ export function renderDetail(container: HTMLElement, id: string) {
     </div>
   `;
 
-  const updateStatus = (status: ApplicationStatus, label: string) => {
+  const updateStatus = (status: ApplicationStatus, label: string): void => {
     updateApplication(id, { status, statusLabel: label });
-    alert(`✅ 状态已更新为：${label}`);
+    showToast(`状态已更新为：${label}`, 'success');
     window.location.hash = 'list';
   };
 

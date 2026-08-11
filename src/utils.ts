@@ -62,8 +62,8 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
     });
   } else if (type === APPLICATION_TYPES.PURCHASE) {
     if (content.items && Array.isArray(content.items) && content.items.length > 0) {
-      const itemsStr = content.items.map((item: any) => `${item.name} × ${item.quantity} = ¥${item.total}`).join('; ');
-      result.push({ label: '物品清单', value: itemsStr });
+      const itemsStr = content.items.map((item: any) => `${item.name}`).join('; ');
+      result.push({ label: '物品名称', value: itemsStr });
     }
     if (content.vendor) result.push({ label: '供应商', value: content.vendor });
     if (content.deliveryDate) result.push({ label: '预计交付日期', value: content.deliveryDate });

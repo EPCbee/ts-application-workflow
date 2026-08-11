@@ -72,7 +72,7 @@ describe('formatContentFields', () => {
     };
     const fields = formatContentFields(content, 'purchase');
     expect(fields).toEqual([
-      { label: '物品清单', value: '笔记本 × 2 = ¥16000' },
+      { label: '物品名称', value: '笔记本' },
       { label: '供应商', value: '联想' },
       { label: '预计交付日期', value: '2026-05-15' },
       { label: '采购原因', value: '设备更新' },

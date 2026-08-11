@@ -1,3 +1,4 @@
+import { showToast } from './components/toast';
 import './style.css';
 import { renderList } from './views/list';
 import { renderCreate } from './views/create';
@@ -25,6 +26,9 @@ function navigate() {
     app.innerHTML = '<div class="card text-center"><h2>404</h2></div>';
   }
 }
+
+// ✅ 将函数挂载到window，运行时全局可用
+(window as typeof window & { showToast: typeof showToast }).showToast = showToast;
 
 window.addEventListener('hashchange', navigate);
 window.addEventListener('load', navigate);
