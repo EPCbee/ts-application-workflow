@@ -46,11 +46,11 @@ export function renderStats(container: HTMLElement) {
 
     container.innerHTML = `
       <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <h2 style="margin:0;">📊 统计报表</h2>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <label style="font-weight:500;">状态筛选：</label>
-            <select id="statusFilter" class="form-control" style="width:auto;">
+        <div class="stat-header-bar">
+          <h2 class="stat-title">📊 统计报表</h2>
+          <div class="stat-filter-wrap">
+            <label class="stat-filter-label">状态筛选：</label>
+            <select id="statusFilter" class="form-control stat-filter-select">
               <option value="all" ${currentFilter === 'all' ? 'selected' : ''}>全部</option>
               <option value="draft" ${currentFilter === 'draft' ? 'selected' : ''}>草稿</option>
               <option value="pending" ${currentFilter === 'pending' ? 'selected' : ''}>待审批</option>
@@ -63,22 +63,22 @@ export function renderStats(container: HTMLElement) {
 
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">总申请数</div><div class="stat-value">${stats.total}</div></div>
-          <div class="stat-card"><div class="stat-label">待审批</div><div class="stat-value" style="color:#d48806;">${stats.byStatus.pending}</div></div>
-          <div class="stat-card"><div class="stat-label">已批准</div><div class="stat-value" style="color:#389e0d;">${stats.byStatus.approved}</div></div>
-          <div class="stat-card"><div class="stat-label">平均处理天数</div><div class="stat-value" style="color:#1890ff;">${stats.avgProcessingTime.toFixed(1)}</div></div>
+          <div class="stat-card"><div class="stat-label">待审批</div><div class="stat-value stat-value-warning">${stats.byStatus.pending}</div></div>
+          <div class="stat-card"><div class="stat-label">已批准</div><div class="stat-value stat-value-success">${stats.byStatus.approved}</div></div>
+          <div class="stat-card"><div class="stat-label">平均处理天数</div><div class="stat-value stat-value-primary">${stats.avgProcessingTime.toFixed(1)}</div></div>
         </div>
 
         <div class="card">
-          <h3 style="margin:0 0 12px 0;">📈 月度申请趋势</h3>
-          <div id="chart" style="height:300px;"></div>
+          <h3 class="chart-title">📈 月度申请趋势</h3>
+          <div id="chart" class="chart-container"></div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;">
+        <div class="stat-two-col-grid">
           <div class="card">
-            <h3 style="margin:0 0 12px 0;">按状态分布</h3>
-            <ul style="list-style:none;padding:0;margin:0;">
+            <h3 class="chart-title">按状态分布</h3>
+            <ul class="stat-list">
               ${Object.entries(stats.byStatus).map(([key, val]) => `
-                <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                <li class="stat-list-item">
                   <span>${statusLabels[key as ApplicationStatus]}</span>
                   <span><strong>${val}</strong></span>
                 </li>
@@ -86,10 +86,10 @@ export function renderStats(container: HTMLElement) {
             </ul>
           </div>
           <div class="card">
-            <h3 style="margin:0 0 12px 0;">按类型分布</h3>
-            <ul style="list-style:none;padding:0;margin:0;">
+            <h3 class="chart-title">按类型分布</h3>
+            <ul class="stat-list">
               ${Object.entries(stats.byType).map(([key, val]) => `
-                <li style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                <li class="stat-list-item">
                   <span>${typeLabels[key as ApplicationType]}</span>
                   <span><strong>${val}</strong></span>
                 </li>

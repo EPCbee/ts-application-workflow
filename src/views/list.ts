@@ -13,10 +13,10 @@ export function renderList(container: HTMLElement) {
     container.innerHTML = `
       <div class="card">
         <h2 class="card-title">📋 申请列表</h2>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;align-items:center;">
-          <div>
-            <label style="font-weight:500;margin-right:4px;">状态：</label>
-            <select id="statusFilter" class="form-control" style="width:auto;">
+        <div class="list-filter-bar">
+          <div class="filter-item">
+            <label class="filter-label">状态：</label>
+            <select id="statusFilter" class="form-control filter-select">
               <option value="all" ${statusFilter === 'all' ? 'selected' : ''}>全部</option>
               <option value="draft" ${statusFilter === 'draft' ? 'selected' : ''}>草稿</option>
               <option value="pending" ${statusFilter === 'pending' ? 'selected' : ''}>待审批</option>
@@ -25,13 +25,13 @@ export function renderList(container: HTMLElement) {
               <option value="cancelled" ${statusFilter === 'cancelled' ? 'selected' : ''}>已取消</option>
             </select>
           </div>
-          <div>
-            <label style="font-weight:500;margin-right:4px;">提交时间从：</label>
-            <input type="date" id="startDate" class="form-control" style="width:auto;display:inline;" value="${startDate || ''}" />
+          <div class="filter-item">
+            <label class="filter-label">提交时间从：</label>
+            <input type="date" id="startDate" class="form-control filter-input" value="${startDate || ''}" />
           </div>
-          <div>
-            <label style="font-weight:500;margin-right:4px;">至：</label>
-            <input type="date" id="endDate" class="form-control" style="width:auto;display:inline;" value="${endDate || ''}" />
+          <div class="filter-item">
+            <label class="filter-label">至：</label>
+            <input type="date" id="endDate" class="form-control filter-input" value="${endDate || ''}" />
           </div>
           <button id="clearDateBtn" class="btn btn-sm">清除日期</button>
         </div>
@@ -48,11 +48,11 @@ export function renderList(container: HTMLElement) {
 
     const tbody = document.getElementById('listBody')!;
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center" style="padding:20px;color:#999;">暂无匹配记录</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7" class="text-center table-empty-row">暂无匹配记录</td></tr>`;
     } else {
       tbody.innerHTML = filtered.map(app => `
         <tr>
-          <td><code style="background:#f5f5f5;padding:2px 8px;border-radius:2px;">${app.id}</code></td>
+          <td><code class="table-id-code">${app.id}</code></td>
           <td>${app.title}</td>
           <td>${app.applicant.name}</td>
           <td>${app.typeLabel}</td>

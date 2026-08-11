@@ -1,4 +1,5 @@
 import type { Applicant, Application, ApplicationType, ApplicationStatus } from './types';
+import { APPLICATION_TYPES, APPLICATION_STATUSES } from './constants';
 
 export const mockEmployees: Applicant[] = [
   { id: 'emp001', name: '张伟', department: '技术研发部', email: 'zhangwei@company.com', phone: '13800001001' },
@@ -11,21 +12,22 @@ export const mockEmployees: Applicant[] = [
 ];
 
 export const typeLabels: Record<ApplicationType, string> = {
-  travel: '差旅申请',
-  purchase: '采购申请',
-  reimbursement: '报销申请',
-  overtime: '加班申请',
-  custom: '自定义申请',
+  [APPLICATION_TYPES.TRAVEL]: '差旅申请',
+  [APPLICATION_TYPES.PURCHASE]: '采购申请',
+  [APPLICATION_TYPES.REIMBURSEMENT]: '报销申请',
+  [APPLICATION_TYPES.OVERTIME]: '加班申请',
+  [APPLICATION_TYPES.CUSTOM]: '自定义申请',
 };
 
 export const statusLabels: Record<ApplicationStatus, string> = {
-  draft: '草稿',
-  pending: '待审批',
-  approved: '已批准',
-  rejected: '已驳回',
-  cancelled: '已取消',
+  [APPLICATION_STATUSES.DRAFT]: '草稿',
+  [APPLICATION_STATUSES.PENDING]: '待审批',
+  [APPLICATION_STATUSES.APPROVED]: '已批准',
+  [APPLICATION_STATUSES.REJECTED]: '已驳回',
+  [APPLICATION_STATUSES.CANCELLED]: '已取消',
 };
 
+// 格式化内容字段
 export function formatContentFields(content: Record<string, any>, type: ApplicationType): Array<{ label: string; value: string }> {
   const result: Array<{ label: string; value: string }> = [];
   const labelMap: Record<string, string> = {
@@ -48,7 +50,7 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
     customFields: '自定义字段',
   };
 
-  if (type === 'travel') {
+  if (type === APPLICATION_TYPES.TRAVEL) {
     const fields = ['destination', 'startDate', 'endDate', 'purpose', 'estimatedCost', 'transportation'];
     fields.forEach(key => {
       const val = content[key];
@@ -58,7 +60,7 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
         result.push({ label: labelMap[key] || key, value: display });
       }
     });
-  } else if (type === 'purchase') {
+  } else if (type === APPLICATION_TYPES.PURCHASE) {
     if (content.items && Array.isArray(content.items) && content.items.length > 0) {
       const itemsStr = content.items.map((item: any) => `${item.name} × ${item.quantity} = ¥${item.total}`).join('; ');
       result.push({ label: '物品清单', value: itemsStr });
@@ -66,7 +68,7 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
     if (content.vendor) result.push({ label: '供应商', value: content.vendor });
     if (content.deliveryDate) result.push({ label: '预计交付日期', value: content.deliveryDate });
     if (content.reason) result.push({ label: '采购原因', value: content.reason });
-  } else if (type === 'reimbursement') {
+  } else if (type === APPLICATION_TYPES.REIMBURSEMENT) {
     if (content.expenses && Array.isArray(content.expenses)) {
       content.expenses.forEach((exp: any, idx: number) => {
         if (exp.category) result.push({ label: `费用${idx+1}类别`, value: exp.category });
@@ -76,7 +78,7 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
       });
     }
     if (content.totalAmount !== undefined) result.push({ label: '总金额', value: `¥${content.totalAmount}` });
-  } else if (type === 'overtime') {
+  } else if (type === APPLICATION_TYPES.OVERTIME) {
     const fields = ['date', 'hours', 'startTime', 'endTime', 'reason'];
     fields.forEach(key => {
       const val = content[key];
@@ -84,7 +86,7 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
         result.push({ label: labelMap[key] || key, value: String(val) });
       }
     });
-  } else if (type === 'custom') {
+  } else if (type === APPLICATION_TYPES.CUSTOM) {
     if (content.customFields && Array.isArray(content.customFields)) {
       content.customFields.forEach((field: any) => {
         if (field.label && field.value) {
@@ -96,25 +98,9 @@ export function formatContentFields(content: Record<string, any>, type: Applicat
   return result;
 }
 
-// 日期过滤，包含结束日期（endDate 当天 23:59:59）
-export function filterApplicationsByDate(
-  apps: Application[],
-  startDate?: string,
-  endDate?: string
-): Application[] {
-  let filtered = apps;
-  if (startDate) {
-    filtered = filtered.filter(a => a.submittedAt && a.submittedAt.slice(0, 10) >= startDate);
-  }
-  if (endDate) {
-    filtered = filtered.filter(a => a.submittedAt && a.submittedAt.slice(0, 10) <= endDate);
-  }
-  return filtered;
-}
-
 function generateMockContent(type: ApplicationType): Record<string, any> {
   const contents: Record<ApplicationType, () => Record<string, any>> = {
-    travel: () => ({
+    [APPLICATION_TYPES.TRAVEL]: () => ({
       destination: ['北京', '上海', '广州', '深圳'][Math.floor(Math.random() * 4)],
       startDate: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       endDate: new Date(Date.now() + (30 + Math.random() * 20) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -122,24 +108,24 @@ function generateMockContent(type: ApplicationType): Record<string, any> {
       estimatedCost: Math.round((2000 + Math.random() * 8000) / 100) * 100,
       transportation: ['飞机', '高铁', '汽车'][Math.floor(Math.random() * 3)],
     }),
-    purchase: () => ({
+    [APPLICATION_TYPES.PURCHASE]: () => ({
       items: [{ name: '笔记本电脑', quantity: 2, unitPrice: 8000, total: 16000 }],
       vendor: '联想',
       deliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       reason: '设备更新',
     }),
-    reimbursement: () => ({
+    [APPLICATION_TYPES.REIMBURSEMENT]: () => ({
       expenses: [{ category: '交通费', amount: 200, date: new Date().toISOString().split('T')[0], description: '打车' }],
       totalAmount: 200,
     }),
-    overtime: () => ({
+    [APPLICATION_TYPES.OVERTIME]: () => ({
       date: new Date().toISOString().split('T')[0],
       startTime: '18:00',
       endTime: '20:00',
       reason: '项目紧急',
       hours: 2,
     }),
-    custom: () => ({
+    [APPLICATION_TYPES.CUSTOM]: () => ({
       customFields: [{ label: '备注', value: '自定义内容' }],
     }),
   };
@@ -178,4 +164,32 @@ export function generateMockApplications(count = 20): Application[] {
     apps.push(app);
   }
   return apps.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+}
+
+// 日期过滤
+export function filterApplicationsByDate(
+  apps: Application[],
+  startDate?: string,
+  endDate?: string
+): Application[] {
+  let filtered = apps;
+  if (startDate) {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+    filtered = filtered.filter(a => {
+      if (!a.submittedAt) return false;
+      const submitted = new Date(a.submittedAt);
+      return submitted >= start;
+    });
+  }
+  if (endDate) {
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    filtered = filtered.filter(a => {
+      if (!a.submittedAt) return false;
+      const submitted = new Date(a.submittedAt);
+      return submitted <= end;
+    });
+  }
+  return filtered;
 }

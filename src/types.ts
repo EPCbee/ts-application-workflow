@@ -32,3 +32,5 @@ export interface ApplicationStats {
   monthlyTrend: Array<{ month: string; count: number }>;
   avgProcessingTime: number;
 }
+
+
