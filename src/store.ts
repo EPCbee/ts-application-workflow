@@ -9,11 +9,7 @@ function loadApplications(): Application[] {
   const data = localStorage.getItem(STORAGE_KEY);
   if (data) {
     try {
-      return JSON.parse(data).map((app: any) => ({
-        ...app,
-        createdAt: app.createdAt,
-        updatedAt: app.updatedAt,
-      }));
+      return JSON.parse(data).map((app: any) => app);
     } catch {}
   }
   const mock = generateMockApplications(30);

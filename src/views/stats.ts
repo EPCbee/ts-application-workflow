@@ -1,7 +1,7 @@
 import * as echarts from 'echarts';
 import { getApplications } from '../store';
 import { statusLabels, typeLabels } from '../utils';
-import type { Application, ApplicationStatus, ApplicationStats } from '../types';
+import type { Application, ApplicationStatus, ApplicationType, ApplicationStats } from '../types';
 
 // 计算统计数据
 function computeStats(apps: Application[]): ApplicationStats {
