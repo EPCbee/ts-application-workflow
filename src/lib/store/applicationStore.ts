@@ -67,6 +67,11 @@ export const applicationStore = {
     const mock = generateMockApplications(30);
     set(mock);
     saveApplications(mock);
+  },
+  // 新增：清空所有数据
+  clear: () => {
+    set([]);
+    saveApplications([]);
   }
 };
 
