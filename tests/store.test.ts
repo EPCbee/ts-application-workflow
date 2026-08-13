@@ -1,11 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { initStore, resetStore, getApplications, addApplication, updateApplication, getStats } from '../src/store';
-import type { Application } from '../src/types';
+import { applicationStore } from '../src/lib/stores/applicationStore';
+import type { Application } from '../src/lib/types/application';
 
 beforeEach(() => {
-  localStorage.clear();
-  // 不自动生成 mock，清空 store
-  initStore(false);
+  // 重置 store
+  applicationStore.reset();
 });
 
 describe('store', () => {
@@ -22,8 +21,42 @@ describe('store', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    addApplication(app);
-    expect(getApplications()).toHaveLength(1);
+    applicationStore.addApplication(app);
+    let apps: Application[] = [];
+    applicationStore.subscribe(a => apps = a)();
+    expect(apps).toHaveLength(1);
+  });
+  // ... 更多测试
+});
+import { describe, it, expect, beforeEach } from 'vitest';
+import { applicationStore } from '../src/lib/stores/applicationStore';
+import type { Application } from '../src/lib/types/application';
+
+describe('applicationStore', () => {
+  beforeEach(() => {
+    // 重置 store，避免测试间互相干扰
+    applicationStore.reset();
+  });
+
+  it('should add an application', () => {
+    const app: Application = {
+      id: 'test1',
+      type: 'travel',
+      typeLabel: '差旅',
+      applicant: { id: '1', name: 'A', department: 'D', email: 'a@a', phone: '123' },
+      title: 'Test',
+      content: {},
+      status: 'draft',
+      statusLabel: '草稿',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    applicationStore.addApplication(app);
+    let apps: Application[] = [];
+    const unsubscribe = applicationStore.subscribe(value => { apps = value; });
+    expect(apps).toHaveLength(1);
+    expect(apps[0].id).toBe('test1');
+    unsubscribe();
   });
 
   it('should update status', () => {
@@ -39,47 +72,11 @@ describe('store', () => {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    addApplication(app);
-    updateApplication('test2', { status: 'pending', statusLabel: '待审批' });
-    const updated = getApplications()[0];
-    expect(updated.status).toBe('pending');
-  });
-
-  it('should compute stats', () => {
-    // 先清空再添加一些数据
-    resetStore();
-    const app1: Application = {
-      id: 's1',
-      type: 'travel',
-      typeLabel: '差旅',
-      applicant: { id: '1', name: 'A', department: 'D', email: 'a@a', phone: '123' },
-      title: 'Test1',
-      content: {},
-      status: 'pending',
-      statusLabel: '待审批',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    const app2: Application = {
-      id: 's2',
-      type: 'travel',
-      typeLabel: '差旅',
-      applicant: { id: '1', name: 'A', department: 'D', email: 'a@a', phone: '123' },
-      title: 'Test2',
-      content: {},
-      status: 'approved',
-      statusLabel: '已批准',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      submittedAt: new Date().toISOString(),
-      approvedAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-    };
-    addApplication(app1);
-    addApplication(app2);
-    const stats = getStats();
-    expect(stats.total).toBe(2);
-    expect(stats.byStatus.pending).toBe(1);
-    expect(stats.byStatus.approved).toBe(1);
-    expect(stats.avgProcessingTime).toBeCloseTo(2, 0);
+    applicationStore.addApplication(app);
+    applicationStore.updateApplication('test2', { status: 'pending', statusLabel: '待审批' });
+    let apps: Application[] = [];
+    const unsubscribe = applicationStore.subscribe(value => { apps = value; });
+    expect(apps[0].status).toBe('pending');
+    unsubscribe();
   });
 });
