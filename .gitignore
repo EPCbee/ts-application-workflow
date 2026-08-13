@@ -1,0 +1,26 @@
+# SvelteKit 自动生成目录
+.svelte-kit/
+
+# 构建输出
+build/
+output/
+
+# 依赖
+node_modules/
+
+# 环境变量
+.env
+.env.*
+!.env.example
+
+# 日志
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 编辑器
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
